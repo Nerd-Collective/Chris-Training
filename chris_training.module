@@ -1,0 +1,56 @@
+<?php
+function chris_training_menu(){
+	$items=array();
+	$items['training-form']=array(
+		'title'=>'Training Form',
+		'description'=>'Some fun with forms...',
+		'page callback'=>'drupal_get_form',
+		'page arguments'=>array('chris_training_form'),
+		'access callback' => TRUE
+	);
+	return $items;
+}
+
+function chris_training_form($form,&$form_state){
+	$form['module_count']=array(
+		'#type'=>'textfield',
+		'#title'=>t('How many modules have you created?'),
+		'#size'=>10,
+		'#maxlength'=>10,
+		'#required'=>TRUE,
+	);
+	$form['module_work']=array(
+		'#type'=>'radios',
+		'#title'=>t('Did they all work correctly?'),
+		'#options'=>array(1=>t('Yes'),0=>t('No')),
+		'#required'=>TRUE,
+	);
+	$form['submit_button'] = array(
+		'#type'=>'submit',
+		'#value'=>t('Submit'),
+		);
+	return $form;
+}
+
+function chris_training_form_validate($form,&$form_state){
+	if(!($form_state['values']['module_count'] > 0)){
+		form_set_error('module_count',t('You must enter a number.'));
+	}
+}
+
+function chris_training_form_submit($form,&$form_state){
+	$body='Module Count: '.$form_state['values']['module_count'].'<br />Did they work? '.($form_state['values']['module_work']==1 ? 'Yes' : 'No');
+	drupal_mail('chris_training','send_form','chris@nerdcollective.com.au',language_default(),array('subject'=>'Completed form','body'=>$body),variable_get('site_mail', ini_get('sendmail_from')),TRUE);
+	drupal_set_message(t('The form has been submitted.'));
+}
+
+function chris_training_mail($key,&$message,$params) 
+{
+       switch ($key) {
+             case 'send_form':
+                  $message['subject']=t($params['subject']);
+                  $message['body'][]=$params['body'];
+                  $message['headers']['Content-Type'] = 'text/html; charset=UTF-8';
+       break;
+          }
+ }

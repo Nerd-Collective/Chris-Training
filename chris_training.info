@@ -1,0 +1,3 @@
+core = "7.x"
+description = "A module created by Chris when learning Drupal"
+name = "Chris Training Module"
